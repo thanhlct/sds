@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <LINK REL="stylesheet" HREF="style.css"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Virtual Personal Assistant</title>
+    <script language="JavaScript">
+        var watsonAppname = 'def001';
+        var watsonGrammar = null;
+        var watsonURL =  'http://service.research.att.com/smm/watson';
+        var useWatsonTimeout = false;
+        var ttsURL = 'https://service.research.att.com/smm/tts';
+        <!--var ttsVoice = 'builtin/mike'-->;
+        var ttsVoice = 'builtin/crystal';
+        var ttsFormat = 'linear';
+        var session = 'new';
+        var uuid = 'D24CB19B8EAF11E4ACAFC1AA6AEC2530';
+
+        function checkApplet() {
+            try {
+                document.WatsonApplet.getClass().getName();
+                document.AudioPlayer.getClass().getName();
+                return true;
+            } catch (e) {
+                alert("An applet is not loaded.\nPlease try reloading the page.");
+                return false;
+            }
+        }
+        function startRecording() {
+            if (!checkApplet())
+                return;
+            display('debug', 'Applet checked');
+            
+            document.AudioPlayer.stop();    
+            var url = watsonURL
+                        + "?uuid=" + uuid
+                        + "&grammar=" + watsonGrammar
+                        + "&appname=" + watsonAppname
+                        + "&resultFormat=json_watson";
+            if (useWatsonTimeout) {
+                url += "&control=activateEvh+%22timeouts%22%3bactivateEvh+%22speechstart-hmm%22%3btimeouts.firstTimeout+=+400%3btimeouts.secondTimeout+=+500";
+            }
+            var applet = document.getElementsByName("WatsonApplet")[0];
+            applet.setUrl(url);
+            display('info', url)
+            applet.startRecording();
+            
+            display('debug', 'Listening');
+        }
+
+        function stopRecording() {
+            var applet = document.getElementsByName("WatsonApplet")[0];
+            applet.stopRecording();
+            display('debug', 'Recognising');
+        }
+
+        function playTTS(text) {
+            if (!checkApplet())
+                return;
+            var url = ttsURL
+                        + '?voice=' + ttsVoice 
+                        + '&uuid=' + uuid
+                        + '&ssml=true';
+            document.AudioPlayer.playWithPOST(url,text);
+        }
+
+        function watsonCallback(asrResultText, session) {
+            try {
+                var asrResult = eval('(' + asrResultText + ')');    
+            } catch(err) {
+                display('debug', 'ASR:ERROR: Problem with response from ASR.<br>Response was: ' + asrResultText);
+                return;
+            }
+            var content = '{"type":"asr_results", "asr":' + asrResultText + '}'
+            display('debug', 'asr:' + content);
+            sendToDM('{"type":"asr_att_results", "asr":' + asrResultText + '}');
+        }
+
+        function startOver(){
+            display('debug', 'startOver');
+            sendToDM('{"type":"new_dialogue"}')
+        }
+
+        function sendToDM(content){
+            content = getFullContent(content)
+            ret = send('dm', content);
+            display('debug', 'recieve: ' + ret)
+            
+            ret = eval('(' + ret + ')');
+            if (ret['message']['tts']){
+                display('info', ret['message']['tts'])
+                playTTS(ret['message']['tts'])
+            }
+            watsonGrammar = ret['message']['grammar']
+            dispalyAppend('debug', 'grammar=' + watsonGrammar)
+        }
+
+        function send(path, content){
+            var url = location.protocol + '//' + location.host + '/' + path;
+            if(window.XMLHttpRequest){
+                xmlhttp=new XMLHttpRequest();
+            }else{
+                display('error', 'Your browser does not support XML-HTTP, try with the latest IE, Firefox, Chrome, Opera');
+            }
+            xmlhttp.open("POST", url, false);
+            xmlhttp.setRequestHeader("Man", "POST " + url + " HTTP/1.1");
+            //xmlhttp.setRequestHeader("MessageType", "CALL")
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.send(content);
+                
+            return(xmlhttp.responseText);
+        }
+
+        function getFullContent(content){
+            //TODO: push session or unique id handling many access paralell
+            fContent = '{"session":"'+session+'", "message":' + content + '}\n';
+            return fContent
+        }
+
+        function display(id, html){
+            document.getElementById(id).innerHTML = html;
+        }
+
+        function dispalyAppend(id, html){
+            document.getElementById(id).innerHTML = document.getElementById(id).innerHTML + '<br>' + html;
+        }
+    </script>
+    
+    <!-- <script src="http://www.java.com/js/deployJava.js"></script> -->
+    <script src="https://service.research.att.com/smm/deployJava.js"></script>
+</head>
+
+<body>
+    <script>
+        var attributes = {
+                name:"WatsonApplet",
+                archive:"SignedApplets.jar",
+                code:"com.att.speechmashups.applet.WatsonApplet.class",
+                width:75,
+                height:16,
+                mayscript:true};
+        var parameters =
+              {
+                  defaultSampleRate:8000,
+                  cookieSuffix:"asrTest"
+              };
+        deployJava.writeAppletTag(attributes, parameters);
+    </script>
+    <script>
+        var attributes = {
+                name:"AudioPlayer",
+                archive:"SignedApplets.jar",
+                code:"com.att.speechmashups.applet.AudioPlayer2.class",
+                width:0,
+                height:0,
+                mayscript:true};
+        deployJava.writeAppletTag(attributes, null);  
+    </script>
+    
+    <form>
+        <input id="butRecord" type="button" value="Press & hold to talk" onmousedown="startRecording()" onmouseup="stopRecording()"/>
+        <input id="butStartOver" type="button" value="Start/restart dialogue" onclick="startOver()"/>
+    </form>
+    <div id='output'></div>
+    <div id='info'></div>
+    <div id='error'></div>
+    <div id='debug'></div>
+</body>
+</html>

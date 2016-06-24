@@ -1,0 +1,564 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<LINK REL="stylesheet" HREF="style.css"/>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>AT&amp;T Statistical Dialog Toolkit demonstrator</title>
+  <script language="JavaScript">
+    var watsonAppname = 'def001';
+    var watsonGrammar = null;
+    var watsonURL =  'http://service.research.att.com/smm/watson';
+    var useWatsonTimeout = false;
+    var ttsURL = 'https://service.research.att.com/smm/tts';
+    <!--var ttsVoice = 'builtin/mike'-->;
+    var ttsVoice = 'builtin/crystal';
+    var ttsFormat = 'linear';
+    var graphRows = 10;
+    var dm2graphRows = 4;    
+    var ASRBarWidth = 100;
+    var DMBarWidth = 100;
+    var DM2BarWidth = 100;
+    var session = 'new';
+    var uuid = null;
+
+    function checkApplet() {
+      try {
+        document.AudioPlayer.getClass().getName();
+        return true;
+      } catch (e) {
+        alert("The AudioPlayer applet is not loaded.\nPlease try reloading the page.");
+        return false;
+      }
+    }
+    
+    function startRecording() {
+        document.AudioPlayer.stop();    
+        showMessage('')
+        setState('listening',null);
+        greyASRResult();
+        greyDialogResult();
+        var url = watsonURL
+            + "?uuid=" + uuid
+            + "&grammar=" + watsonGrammar
+            + "&appname=" + watsonAppname
+            + "&resultFormat=json_watson";
+        if (useWatsonTimeout) {
+            url += "&control=activateEvh+%22timeouts%22%3bactivateEvh+%22speechstart-hmm%22%3btimeouts.firstTimeout+=+400%3btimeouts.secondTimeout+=+500";
+        }
+        var applet = document.getElementsByName("WatsonApplet")[0];
+        applet.setUrl(url);
+	display('info', url)
+        applet.startRecording();
+    }
+    function stopRecording() {
+        setState('recognizing',null);
+        var applet = document.getElementsByName("WatsonApplet")[0];
+        applet.stopRecording();
+    }
+    function watsonCallback(asrResultText, session) {
+        try {
+          var asrResult = eval('(' + asrResultText + ')')
+        } catch(err) {
+          showMessage('Problem with response from ASR.<br><br>Response was: ' + asrResultText);
+          setState('dialogOver','');
+          return;          
+        }
+        showASRResult(asrResultText);
+        setState('dialoging','');
+        doDialogUpdate(asrResultText);
+    }
+
+    function doDialogUpdate(inputText) {
+        var content = '{"session":"'+session+'", "message":'+inputText+'}\n';
+        dialogResultText = sendToDialogManager(content,'dm');
+        if (dialogResultText == null) {
+          setState('dialogOver','');
+        }
+        try {
+          dialogResultObject = eval('(' + dialogResultText + ')');
+        } catch(err) {
+          showMessage('Problem with response from dialog server (is httpd running?).<br><br>Response was: ' + dialogResultText);
+          return;
+        }
+        if (!(dialogResultObject['status'] && dialogResultObject['status'] == 'ok')) {
+            if (dialogResultObject['error'] && dialogResultObject['error_msg']) {
+              error_msg = 'Server reported error ' + dialogResultObject['error'] + 
+                          ': '+dialogResultObject['error_msg']+'. ';
+            } else {
+              error_msg = 'Server reported an error (details not provided). ';
+            }
+            error_msg = error_msg + 'Please try starting a new dialog.';
+            showMessage(error_msg);
+            setState('dialogOver','');
+            return;          
+        } else if (dialogResultObject['message']['sysAction']['action']) {
+          showDialogResult('DM',graphRows,DMBarWidth,dialogResultObject['message']['dialogResult']['joint']);
+          showDialogResult('DM2',dm2graphRows,DM2BarWidth,dialogResultObject['message']['dialogResult']['marginal']);
+          entries = dialogResultObject['message']['dialogResult']['joint'].length;
+          if (entries == 1) { s = ''; } else { s = 's'; }
+          document.getElementById("DMTitle").innerHTML = 'Joint dialog state : '+entries+' partition' + s;
+          if (dialogResultObject['message']['asrProbs']) {
+            showASRProbs(dialogResultObject['message']['asrProbs'])
+          }
+          session = "continue";
+          if (dialogResultObject['message']['sysAction']['tts'] && 
+              dialogResultObject['message']['sysAction']['tts'] != null) {
+            setState('ttsing',dialogResultObject['message']['sysAction']['tts']);
+            playTTS(dialogResultObject['message']['sysAction']['tts']);
+          }
+          if (dialogResultObject['message']['sysAction']['action'] == 'endDialog') {
+            setState('dialogOver',null);
+          } else if (dialogResultObject['message']['sysAction']['action'] == 'ask') {
+            setState('ready',null);
+            watsonGrammar = dialogResultObject['message']['sysAction']['grammar'];
+          } else {
+            showMessage('Server returned an unknown action: ' + dialogResultObject['message']['sysAction']['action'] + '.  Please try starting a new dialog.');
+            setState('dialogOver','');
+            return;
+          }
+        } else {
+            showMessage('Could not parse message from server.  Please try starting a new dialog.');
+            setState('dialogOver','');
+            return;
+        }
+    }
+    
+    function startOver() {
+      sampleName();
+      greyASRResult();
+      session = 'new';
+      setState('connecting','');
+      doDialogUpdate('{}');
+    }
+
+    function sampleName() {
+        content = '{"session":"new", "message":""}\n';
+        dialogResultText = sendToDialogManager(content,'sampleName');
+        if (dialogResultText == null) {
+          showMessage('Could not sample a name to display (no response from server)');
+          return;
+        }
+        try { 
+          dialogResultObject = eval('(' + dialogResultText + ')');
+        } catch(err) {
+          showMessage('Could not sample a name to display (is httpd running?).<br><br>Response was: ' + dialogResultText);
+          return;
+        }
+        if (!(dialogResultObject['status'] && dialogResultObject['status'] == 'ok')) {
+          showMessage('Could not sample a name to display (error reported generating response).  Response was: ' + dialogResultText);
+          return;
+        } else if (dialogResultObject['message']['nameText']) {
+            showName('Example listing: ' + dialogResultObject['message']['nameText']);
+        }
+    }
+    
+    function greyDialogResult() {
+      greyDialogResultHelper('DM',graphRows);
+      greyDialogResultHelper('DM2',dm2graphRows);
+    }
+    
+    function greyDialogResultHelper(prefix,rowCount) {
+      for(i=0;i<rowCount;i++) {
+        element = document.getElementById(prefix+"Result"+i);
+        element.setAttribute("class", prefix+"ResultGrey");
+        element.setAttribute("className", prefix+"ResultGrey"); 
+        element.innerHTML = '[empty]';
+        elementOn = document.getElementById(prefix+"Bar"+i);
+        elementOn.setAttribute("class", prefix+"BarGrey");
+        elementOn.setAttribute("className", prefix+"BarGrey"); 
+        elementOff = document.getElementById(prefix+"BarOff"+i);
+        onWidthStr = '0px';
+        offWidthStr = '200px';
+        elementOn.style.width = onWidthStr;
+        elementOff.style.width = offWidthStr;
+      }
+    }
+    
+    function showDialogResult(prefix,rowCount,barWidth,DMResultObject) {
+      entries = DMResultObject.length;
+      for(i=0;i<rowCount;i++) {
+        elementText = document.getElementById(prefix+"Result"+i);
+        elementOn = document.getElementById(prefix+"Bar"+i);
+        elementOff = document.getElementById(prefix+"BarOff"+i);
+        if (DMResultObject.length > i) {
+          elementText.innerHTML = DMResultObject[i]['text'];
+          elementText.setAttribute("class", prefix+"ResultOn");
+          elementText.setAttribute("className", prefix+"ResultOn"); 
+          if (i==0) {
+            onClass = prefix+"BarLeftover";
+          } else {
+            onClass = prefix+"BarOn";
+          }
+          elementOn.setAttribute("class", onClass);
+          elementOn.setAttribute("className", onClass); 
+          if (DMResultObject[i]['prob'] < 0.00001) {
+            onWidthInt = 0;
+          } else {
+            onWidthInt = parseInt(DMResultObject[i]['prob'] * barWidth);
+          }
+          offWidthInt = barWidth - onWidthInt;
+        } else {
+          elementText.innerHTML = '[empty]'
+          elementText.setAttribute("class", prefix+"ResultGrey");
+          elementText.setAttribute("className", prefix+"ResultGrey"); 
+          elementOn.setAttribute("class", prefix+"BarGrey");
+          elementOn.setAttribute("className", prefix+"BarGrey"); 
+          onWidthInt = 0;
+          offWidthInt = barWidth;
+        }
+        onWidthStr = onWidthInt.toString() + 'px';
+        offWidthStr = offWidthInt.toString() + 'px';
+        elementOn.style.width = onWidthStr;
+        elementOff.style.width = offWidthStr;
+      }          
+    }
+
+    function greyASRResult() {
+      for(i=0;i<graphRows;i++) {
+        element = document.getElementById("ASRResult"+i);
+        element.setAttribute("class", "ASRResultGrey");
+        element.setAttribute("className", "ASRResultGrey"); 
+        element.innerHTML = '[empty]';
+        elementOn = document.getElementById("ASRBar"+i);
+        elementOn.setAttribute("class", "ASRBarGrey");
+        elementOn.setAttribute("className", "ASRBarGrey"); 
+        elementOff = document.getElementById("ASRBarOff"+i);
+        onWidthStr = '0px';
+        offWidthStr = '200px';
+        elementOn.style.width = onWidthStr;
+        elementOff.style.width = offWidthStr;
+      }
+    }
+    
+    function showASRProbs(probs) {
+      probTotal = 0.0
+      for(i=1;i<=probs.length && i<graphRows;i++) {
+        elementOn = document.getElementById("ASRBar"+i);
+        onClass = "ASRBarOn";
+        elementOn.setAttribute("class", onClass);
+        elementOn.setAttribute("className", onClass); 
+        elementOff = document.getElementById("ASRBarOff"+i);
+        probTotal += probs[i-1];
+        if (probs[i-1] < 0.00001) {
+          onWidthInt = 0;
+        } else {
+          onWidthInt = parseInt(probs[i-1] * ASRBarWidth);
+        }
+        offWidthInt = ASRBarWidth - onWidthInt;
+        onWidthStr = onWidthInt.toString() + 'px';
+        offWidthStr = offWidthInt.toString() + 'px';
+        elementOn.style.width = onWidthStr;
+        elementOff.style.width = offWidthStr;
+      }
+      elementOn = document.getElementById("ASRBar0");
+      onClass = "ASRBarLeftover";
+      elementOn.setAttribute("class", onClass);
+      elementOn.setAttribute("className", onClass); 
+      elementOff = document.getElementById("ASRBarOff0");
+      probTotal = 1.0 - probTotal;
+      if (probTotal < 0.00001) {
+        onWidthInt = 0;
+      } else {
+        onWidthInt = parseInt(probTotal * ASRBarWidth);
+      }
+      offWidthInt = ASRBarWidth - onWidthInt;
+      onWidthStr = onWidthInt.toString() + 'px';
+      offWidthStr = offWidthInt.toString() + 'px';
+      elementOn.style.width = onWidthStr;
+      elementOff.style.width = offWidthStr;
+    }
+    
+    function showASRResult(asrResultText) {
+      try {
+        var asrResultObject = eval('(' + asrResultText + ')')
+      } catch(err) {
+        showMessage('Problem with response from ASR.<br><br>Response was: ' + asrResultText);
+        setState('dialogOver','');
+        return;          
+      }
+      entries = asrResultObject['nbest'].length;
+      if (entries == 1) { s = ''; } else { s = 's'; }
+      document.getElementById("ASRTitle").innerHTML = 'ASR Output : '+entries+' result' + s;
+      for(i=1;i<graphRows;i++) {
+        element = document.getElementById("ASRResult"+i);
+        if (asrResultObject['nbest'].length >= i) {
+          element.innerHTML = asrResultObject['nbest'][i-1]['hypothesis'];
+          element.setAttribute("class", "ASRResultOn");
+          element.setAttribute("className", "ASRResultOn"); 
+        } else {
+          element.innerHTML = '[empty]'
+          element.setAttribute("class", "ASRResultGrey");
+          element.setAttribute("className", "ASRResultGrey"); 
+        }
+      }
+      element = document.getElementById("ASRResult0");
+      element.innerHTML = '[remaining]';
+      element.setAttribute("class", "ASRResultOn");
+      element.setAttribute("className", "ASRResultOn"); 
+    }
+    
+    function setState(stateName,promptText) {
+      switch (stateName) {
+        case 'ready': 
+          document.getElementById("talkButton").disabled = false;
+          document.getElementById("startOverButton").disabled = false;
+          setStateIndicator('ready');
+          break;
+        case 'listening': 
+          document.getElementById("talkButton").disabled = false;
+          document.getElementById("startOverButton").disabled = false;
+          setStateIndicator('ready');
+          break;
+        case 'recognizing':
+          setStateIndicator('busy');
+          break;
+        case 'dialoging':
+          document.getElementById("talkButton").disabled = true;
+          document.getElementById("startOverButton").disabled = true;
+          setStateIndicator('busy');
+          break;
+        case 'ttsing':
+          document.getElementById("talkButton").disabled = true;
+          document.getElementById("startOverButton").disabled = true;
+          setStateIndicator('busy');
+          break;
+        case 'connecting':
+          document.getElementById("talkButton").disabled = true;
+          document.getElementById("startOverButton").disabled = true;
+          setStateIndicator('busy');
+          break;
+        case 'dialogOver':
+          document.getElementById("talkButton").disabled = true;
+          document.getElementById("startOverButton").disabled = false;
+          setStateIndicator('end');
+          break;
+        default: 
+          alert('ERROR: dont know stateName ' + stateName);
+      }
+      setStateName(stateName);
+      if (promptText != null) {
+        setPromptText(promptText);
+      }
+    }
+    
+    function setStateIndicator(stateIndicator) {
+      if (stateIndicator == 'ready') {
+        src = "status-green.jpg";
+      } else if (stateIndicator == 'busy') {
+        src = "status-yellow.jpg";
+      } else {
+        src = "status-red.jpg";
+      }
+      document.getElementById("stateIndicator").src = src;
+    }
+    
+    function showMessage(messageText) {
+      if (messageText == '') { messageText = '&nbsp;'; }
+      document.getElementById("errorMsg").innerHTML = messageText;
+    }
+
+    function showName(messageText) {
+      if (messageText == '') { messageText = '&nbsp;'; }
+      document.getElementById("nameDisplay").innerHTML = messageText;
+    }
+
+    function setStateName(stateName) {
+      if (stateName == '') { stateName = '&nbsp;'; }
+      document.getElementById("stateName").innerHTML = stateName;
+    }
+    
+    function setPromptText(promptText) {
+      if (promptText == '') { promptText = '&nbsp;'; }
+      document.getElementById("promptText").innerHTML = promptText;
+    }
+    
+    function sendToDialogManager(content,script) {
+        var url = location.protocol + '//' + location.host + '/' + script;
+        if (window.XMLHttpRequest) { // IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        } else { // IE6, IE5
+            try {
+                xmlhttp=new ActiveXObject("MSXML2.XMLHTTP.3.0");
+            } catch(ex) {
+                alert("This browser does not support XML-HTTP");
+                showMessag("This browser does not support XML-HTTP");
+                return(null);
+            }
+        }
+        xmlhttp.open("POST", url,false);
+        xmlhttp.setRequestHeader("Man", "POST " + url + " HTTP/1.1");
+        // xmlhttp.setRequestHeader("MessageType", "CALL")
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(content);
+        return(xmlhttp.responseText);
+    }    
+    
+    function playTTS(text) {
+        if (!checkApplet())
+          return;
+        var url = ttsURL
+          + '?voice=' + ttsVoice 
+          + '&uuid=' + uuid
+          + '&ssml=true';
+        document.AudioPlayer.playWithPOST(url,text);
+    }
+
+    function initialDisplay() {
+        var content = '{"session":"new", "message":""}\n';
+        var dialogResultText = sendToDialogManager(content,'info');
+        if (dialogResultText == null) {
+          showMessage('Could not sample a name to display (no response from server)');
+          return;
+        }
+        try {
+          dialogResultObject = eval('(' + dialogResultText + ')');
+        } catch(err) {
+          showMessage('Problem with response from dialog server (is httpd running?).<br><br>Response was: ' + dialogResultText);
+          return;
+        }
+        if (!(dialogResultObject['status'] && dialogResultObject['status'] == 'ok')) {
+          showMessage('Could not get server info');
+          return;
+        } else {
+            uuid = dialogResultObject['message']['uuid'];
+            // document.getElementById('uuidVal').innerHTML = uuid;
+            document.getElementById('uuidVal').innerHTML = "[hidden]";
+            document.getElementById('dmVal').innerHTML = dialogResultObject['message']['dmModuleName'];
+        }      
+    }
+
+    function init() {
+      initialDisplay();
+      startOver();
+    }
+    window.onload = init;       
+
+  </script>
+  <!-- Java Deployment Toolkit -->
+  <!-- <script src="http://www.java.com/js/deployJava.js"></script> -->
+  <script src="https://service.research.att.com/smm/deployJava.js"></script>
+</head>
+
+<body>
+  <script>
+  var attributes = {
+    name:"WatsonApplet",
+    archive:"SignedApplets.jar",
+    code:"com.att.speechmashups.applet.WatsonApplet.class",
+    width:0,
+    height:0,
+    mayscript:true};
+  deployJava.writeAppletTag(attributes, null);
+  </script>
+
+  <script>
+  var attributes = {
+    name:"AudioPlayer",
+    archive:"SignedApplets.jar",
+    code:"com.att.speechmashups.applet.AudioPlayer2.class",
+    width:0,
+    height:0,
+    mayscript:true};
+  deployJava.writeAppletTag(attributes, null);  
+  </script>
+  
+  <form>
+  <div class="title">AT&amp;T Statistical Dialog Toolkit Demonstrator</div>
+  <br>
+    <table>
+      <tr><td class="vbuffer"/></tr><tr><td class="hline"/></tr><tr><td class="vbuffer"/></tr>
+      <tr><td class="topArea">
+        <table>
+          <tr><td class="uuidName">UUID:&nbsp;</td>
+              <td class="uuidVal" id="uuidVal">[empty]</td></tr>
+          <tr><td class="dmName">DM Script:&nbsp;</td>
+              <td class="dmVal" id="dmVal">[empty]</td></tr>
+        </table></tr>
+      <tr><td class="vbuffer"/></tr><tr><td class="hline"/></tr><tr><td class="vbuffer"/></tr>
+      <tr><td class="center">
+        <table>
+          <tr><td class="ASRArea">
+            <div class="colHead" id="ASRTitle">ASR Output</div><br/>
+            <table>
+<script language="JavaScript">
+for (i=0;i<graphRows;i++) {
+  document.write('<tr><td class="ASRResultGrey" id="ASRResult'+i+'">[empty]</td><td class="hbuffer"/>');
+  document.write('<td class="ASRBars"><table class="ASRBarsTable"><tr>');
+  document.write('<td class="ASRBarGrey" id="ASRBar'+i+'" width="0"/><td class="ASRBarOff" id="ASRBarOff'+i+'" width="200"/>');
+  document.write('</tr></table></td>');
+  document.write('</tr>');
+  if (i < (graphRows-1)) {
+    document.write('<tr><td class="graphSpacer"/></tr>');
+  }
+}
+</script>
+            </table>
+          </td>
+          <td class="hbuffer"/><td class="vline"/><td class="hbuffer"/>
+          <td class="DMArea">
+            <div class="colHead" id="DMTitle">Joint dialog state</div><br/>
+            <table>
+<script language="JavaScript">
+for (i=0;i<graphRows;i++) {
+  document.write('<tr><td class="DMResultGrey" id="DMResult'+i+'">[empty]</td><td class="hbuffer"/>');
+  document.write('<td class="DMBars"><table class="DMBarsTable"><tr>');
+  document.write('<td class="DMBarOn" id="DMBar'+i+'" width="0"/><td class="DMBarOff" id="DMBarOff'+i+'" width="200"/>');
+  document.write('</tr></table></td>');
+  document.write('</tr>');
+  if (i < (graphRows-1)) {
+    document.write('<tr><td class="graphSpacer"/></tr>');
+  }
+}
+</script>
+            </table>
+          </td>
+          <td class="hbuffer"/><td class="vline"/><td class="hbuffer"/>
+          <td class="DM2Area">
+            <div class="colHead" id="DM2Title">Marginal dialog state</div><br/>
+            <table>
+<script language="JavaScript">
+for (i=0;i<dm2graphRows;i++) {
+  document.write('<tr><td class="DM2ResultGrey" id="DM2Result'+i+'">[empty]</td><td class="hbuffer"/>');
+  document.write('<td class="DM2Bars"><table class="DM2BarsTable"><tr>');
+  document.write('<td class="DM2BarOn" id="DM2Bar'+i+'" width="0"/><td class="DM2BarOff" id="DM2BarOff'+i+'" width="200"/>');
+  document.write('</tr></table></td>');
+  document.write('</tr>');
+  if (i < (dm2graphRows-1)) {
+    document.write('<tr><td class="graphSpacer"/></tr>');
+  }
+}
+</script>
+            </table>
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td class="vbuffer"/></tr><tr><td class="hline"/></tr><tr><td class="vbuffer"/></tr>
+      <tr><td class="prompt" id="promptText">&nbsp;</td></tr>
+      <tr><td class="vbuffer"/></tr>
+      <tr><td class="nameDisplay" id="nameDisplay">&nbsp;</td></tr>
+      <tr><td class="vbuffer"/></tr>
+      <tr><td class="errorMsg" id="errorMsg">&nbsp;</td></tr>
+      <tr><td class="vbuffer"/></tr><tr><td class="hline"/></tr><tr><td class="vbuffer"/></tr>
+      <tr><td class="bottomArea">
+      <table>
+        <tr><td class="statusMsg" id="stateName">Not connected</td>
+            <td class="statusLight">&nbsp;<img id="stateIndicator" src="status-red.jpg"/>&nbsp;</td>
+            <td class="talkButtonCell">
+              <input id="talkButton" type="button" value="Press & Hold to Talk" 
+                     onmousedown="startRecording()" onmouseup="stopRecording()">&nbsp;</td>
+            <td class="startOverCell">&nbsp;
+              <input id="startOverButton" type="button" value="Start/Restart dialog"
+                     onclick="showMessage(''); startOver();"></td>
+            <!-- <td class="resetCell">&nbsp;
+              <input id="resetButton" type="button" value="Reset"
+                     onclick="window.location.reload();"></td> -->
+        </tr>
+      </table></td></tr>
+      <tr><td class="vbuffer"/></tr>
+    </table>
+    <p class="footer">Jason Williams &nbsp;&nbsp; AT&amp;T Labs - Research &nbsp;&nbsp; jdw@research.att.com &nbsp;&nbsp; www.research.att.com/people/Williams_Jason_D</p>
+  </form>
+</body>
+</html>
+

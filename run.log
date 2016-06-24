@@ -1,0 +1,404 @@
+2015-05-12 10:53:32,773    DEBUG   34 simple_user_simulator:UserSimulator.__init__: Params = {'patience': {'continueProb': 0.4, 'endProb': 0.6}, 'request': {'directAnswerProb': 0.6, 'silenceProb': 0.2, 'oogProb': 0.2}}
+2015-05-12 10:53:32,867    DEBUG   33 simple_asr_simulator:ASRSimulator.__init__: Params = {'default': {'onlistFraction': {'alpha': 0.75, 'beta': 1.5}, 'confusionMatrix': {'inform': {'onlist': 0.15, 'offlist': 0.15, 'correct': 0.7, 'silent': 0.0}, 'oog': {'offlist': 1.0, 'silent': 0.0}, 'silent': {'offlist': 0.05, 'silent': 0.95}}, 'probGenerator': {'inform': {'onlist': {'onlist': 1.0, 'offlist': 2.5, 'correct': 2.5}, 'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}, 'correct': {'onlist': 1.0, 'offlist': 3.0, 'correct': 6.0}}, 'oog': {'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}}, 'silent': {'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}}}, 'maxLength': 3}, 'decision': {'onlistFraction': {'alpha': 0.75, 'beta': 1.5}, 'confusionMatrix': {'inform': {'onlist': 0.15, 'offlist': 0.15, 'correct': 0.7, 'silent': 0.0}, 'oog': {'offlist': 1.0, 'silent': 0.0}, 'silent': {'offlist': 0.05, 'silent': 0.95}}, 'probGenerator': {'inform': {'onlist': {'onlist': 1.0, 'offlist': 2.5, 'correct': 2.5}, 'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}, 'correct': {'onlist': 1.0, 'offlist': 3.0, 'correct': 6.0}}, 'oog': {'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}}, 'silent': {'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}}}, 'maxLength': 3}, 'confirm': {'onlistFraction': {'alpha': 0.75, 'beta': 1.5}, 'confusionMatrix': {'inform': {'onlist': 0.15, 'offlist': 0.15, 'correct': 0.7, 'silent': 0.0}, 'oog': {'offlist': 1.0, 'silent': 0.0}, 'silent': {'offlist': 0.05, 'silent': 0.95}}, 'probGenerator': {'inform': {'onlist': {'onlist': 1.0, 'offlist': 2.5, 'correct': 2.5}, 'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}, 'correct': {'onlist': 1.0, 'offlist': 3.0, 'correct': 6.0}}, 'oog': {'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}}, 'silent': {'offlist': {'onlist': 1.0, 'offlist': 6.0, 'correct': 3.0}}}, 'maxLength': 3}}
+2015-05-12 10:53:32,928     INFO   24 simple_belief_tracker:BeliefState.__init__: rowID	PI	Probability
+------------------------ 
+0	accept	0.33
+1	delay	0.33
+2	reject	0.33
+2015-05-12 10:53:32,928     INFO   25 simple_belief_tracker:BeliefState.__init__: rowID	DecisionState	Observation	Probability
+------------------------ 
+0	accept	accept	0.5
+1	accept	delay	0.3
+2	accept	reject	0.2
+3	delay	accept	0.3
+4	delay	delay	0.5
+5	delay	reject	0.2
+6	reject	accept	0.25
+7	reject	delay	0.25
+8	reject	reject	0.5
+2015-05-12 10:53:32,976     INFO   44 simple_user_simulator:UserSimulator.new_dialogue: 
+-----------------------------------------------------------------------------
+2015-05-12 10:53:32,976     INFO   45 simple_user_simulator:UserSimulator.new_dialogue: 		User Goal: {'decision': 'reject'}
+2015-05-12 10:53:32,976     INFO   46 simple_user_simulator:UserSimulator.new_dialogue: 
+-----------------------------------------------------------------------------
+2015-05-12 10:53:32,976     INFO   29 simple_simulator:Simulator.simulate_one_dialogue: 
+
+-----------------------------------------------------------------------------
+2015-05-12 10:53:32,992     INFO   30 simple_simulator:Simulator.simulate_one_dialogue: Dialogue 1.		User Goal: {'decision': 'reject'}
+2015-05-12 10:53:33,006     INFO   31 simple_simulator:Simulator.simulate_one_dialogue: -----------------------------------------------------------------------------
+2015-05-12 10:53:33,023     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 1 ------
+2015-05-12 10:53:33,256     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&hello{}
+2015-05-12 10:53:33,256     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&hello{}
+2015-05-12 10:53:33,256     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=silent{}
+2015-05-12 10:53:33,256     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= silent{}
+2015-05-12 10:53:33,273     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:33,273     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:33,273     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.33
+1	delay	0.33
+2	reject	0.33
+2015-05-12 10:53:33,289     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 2 ------
+2015-05-12 10:53:33,742     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:33,742     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:33,742     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'reject'}
+2015-05-12 10:53:33,742     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'reject'}
+2015-05-12 10:53:33,756     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'reject'} (0.850743)
+inform{'decision': 'accept'} (0.029068)
+inform{'decision': 'delay'} (0.010767)
+[rest] (0.109422)
+2015-05-12 10:53:33,756     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'reject'} (0.850743)
+inform{'decision': 'accept'} (0.029068)
+inform{'decision': 'delay'} (0.010767)
+[rest] (0.109422)
+2015-05-12 10:53:33,756     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.232710512533
+1	delay	0.228177866364
+2	reject	0.539111621103
+2015-05-12 10:53:33,773     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 3 ------
+2015-05-12 10:53:34,273     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:34,289     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:34,289     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'reject'}
+2015-05-12 10:53:34,289     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'reject'}
+2015-05-12 10:53:34,289     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'delay'} (0.329487)
+inform{'decision': 'reject'} (0.231722)
+inform{'decision': 'accept'} (0.085835)
+[rest] (0.352956)
+2015-05-12 10:53:34,289     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'delay'} (0.329487)
+inform{'decision': 'reject'} (0.231722)
+inform{'decision': 'accept'} (0.085835)
+[rest] (0.352956)
+2015-05-12 10:53:34,303     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.202422457016
+1	delay	0.249897069135
+2	reject	0.547680473848
+2015-05-12 10:53:34,319     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 4 ------
+2015-05-12 10:53:34,789     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:34,789     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:34,803     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=oog{}
+2015-05-12 10:53:34,803     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= oog{}
+2015-05-12 10:53:34,803     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'accept'} (0.400324)
+inform{'decision': 'reject'} (0.015723)
+[rest] (0.583952)
+2015-05-12 10:53:34,803     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'accept'} (0.400324)
+inform{'decision': 'reject'} (0.015723)
+[rest] (0.583952)
+2015-05-12 10:53:34,819     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.313984499346
+1	delay	0.234972613097
+2	reject	0.451042887557
+2015-05-12 10:53:34,835     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 5 ------
+2015-05-12 10:53:35,303     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:35,319     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:35,319     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=oog{}
+2015-05-12 10:53:35,319     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= oog{}
+2015-05-12 10:53:35,319     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'reject'} (0.345107)
+inform{'decision': 'accept'} (0.056639)
+[rest] (0.598254)
+2015-05-12 10:53:35,319     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'reject'} (0.345107)
+inform{'decision': 'accept'} (0.056639)
+[rest] (0.598254)
+2015-05-12 10:53:35,335     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.22641368517
+1	delay	0.149720280427
+2	reject	0.623866034404
+2015-05-12 10:53:35,351     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 6 ------
+2015-05-12 10:53:35,867     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=end{}&reject{'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}
+2015-05-12 10:53:36,194     INFO   84 simple_simulator:Simulator.simulate_one_dialogue: TOTAL REWARD	=-1.000000
+2015-05-12 10:53:36,210     INFO   44 simple_user_simulator:UserSimulator.new_dialogue: 
+-----------------------------------------------------------------------------
+2015-05-12 10:53:36,210     INFO   45 simple_user_simulator:UserSimulator.new_dialogue: 		User Goal: {'decision': 'delay'}
+2015-05-12 10:53:36,210     INFO   46 simple_user_simulator:UserSimulator.new_dialogue: 
+-----------------------------------------------------------------------------
+2015-05-12 10:53:36,210     INFO   29 simple_simulator:Simulator.simulate_one_dialogue: 
+
+-----------------------------------------------------------------------------
+2015-05-12 10:53:36,226     INFO   30 simple_simulator:Simulator.simulate_one_dialogue: Dialogue 2.		User Goal: {'decision': 'delay'}
+2015-05-12 10:53:36,226     INFO   31 simple_simulator:Simulator.simulate_one_dialogue: -----------------------------------------------------------------------------
+2015-05-12 10:53:36,242     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 1 ------
+2015-05-12 10:53:36,648     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:36,648     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:36,664     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=silent{}
+2015-05-12 10:53:36,664     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= silent{}
+2015-05-12 10:53:36,664     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:36,664     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:36,678     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.33
+1	delay	0.33
+2	reject	0.33
+2015-05-12 10:53:36,678     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 2 ------
+2015-05-12 10:53:37,178     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:37,194     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:37,194     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=silent{}
+2015-05-12 10:53:37,194     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= silent{}
+2015-05-12 10:53:37,194     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'reject'} (0.194632)
+inform{'decision': 'accept'} (0.366237)
+[rest] (0.439131)
+2015-05-12 10:53:37,194     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'reject'} (0.194632)
+inform{'decision': 'accept'} (0.366237)
+[rest] (0.439131)
+2015-05-12 10:53:37,210     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.396708766594
+1	delay	0.265843858315
+2	reject	0.337447375091
+2015-05-12 10:53:37,226     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 3 ------
+2015-05-12 10:53:37,694     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:37,694     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:37,694     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=oog{}
+2015-05-12 10:53:37,694     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= oog{}
+2015-05-12 10:53:37,710     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'accept'} (0.461530)
+inform{'decision': 'delay'} (0.016114)
+[rest] (0.522355)
+2015-05-12 10:53:37,710     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'accept'} (0.461530)
+inform{'decision': 'delay'} (0.016114)
+[rest] (0.522355)
+2015-05-12 10:53:37,726     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.541164196252
+1	delay	0.225525454822
+2	reject	0.233310348926
+2015-05-12 10:53:37,742     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 4 ------
+2015-05-12 10:53:38,226     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:38,242     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:38,242     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'delay'}
+2015-05-12 10:53:38,242     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'delay'}
+2015-05-12 10:53:38,242     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'reject'} (0.303227)
+[rest] (0.696773)
+2015-05-12 10:53:38,242     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'reject'} (0.303227)
+[rest] (0.696773)
+2015-05-12 10:53:38,256     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.400872605171
+1	delay	0.167060158882
+2	reject	0.432067235947
+2015-05-12 10:53:38,273     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 5 ------
+2015-05-12 10:53:38,914     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:38,914     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:38,914     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'delay'}
+2015-05-12 10:53:38,914     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'delay'}
+2015-05-12 10:53:38,928     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'delay'} (0.767848)
+inform{'decision': 'reject'} (0.040892)
+[rest] (0.191260)
+2015-05-12 10:53:38,928     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'delay'} (0.767848)
+inform{'decision': 'reject'} (0.040892)
+[rest] (0.191260)
+2015-05-12 10:53:38,992     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.378098344006
+1	delay	0.259013652455
+2	reject	0.362888003539
+2015-05-12 10:53:39,039     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 6 ------
+2015-05-12 10:53:39,694     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:39,694     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:39,694     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=silent{}
+2015-05-12 10:53:39,694     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= silent{}
+2015-05-12 10:53:39,710     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:39,710     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:39,710     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.378098344006
+1	delay	0.259013652455
+2	reject	0.362888003539
+2015-05-12 10:53:39,726     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 7 ------
+2015-05-12 10:53:40,164     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:40,164     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:40,164     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'delay'}
+2015-05-12 10:53:40,164     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'delay'}
+2015-05-12 10:53:40,178     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'delay'} (0.376634)
+inform{'decision': 'accept'} (0.176206)
+[rest] (0.447159)
+2015-05-12 10:53:40,178     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'delay'} (0.376634)
+inform{'decision': 'accept'} (0.176206)
+[rest] (0.447159)
+2015-05-12 10:53:40,178     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.40302390907
+1	delay	0.331123672057
+2	reject	0.265852418874
+2015-05-12 10:53:40,194     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 8 ------
+2015-05-12 10:53:40,601     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:40,617     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:40,617     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=silent{}
+2015-05-12 10:53:40,617     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= silent{}
+2015-05-12 10:53:40,617     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:40,617     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+silent{} (1.000000)
+[rest] (0.000000)
+2015-05-12 10:53:40,631     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.40302390907
+1	delay	0.331123672057
+2	reject	0.265852418874
+2015-05-12 10:53:40,631     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 9 ------
+2015-05-12 10:53:41,053     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:41,069     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:41,069     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'delay'}
+2015-05-12 10:53:41,069     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'delay'}
+2015-05-12 10:53:41,069     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'delay'} (0.790401)
+inform{'decision': 'reject'} (0.022366)
+inform{'decision': 'accept'} (0.008285)
+[rest] (0.178948)
+2015-05-12 10:53:41,069     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'delay'} (0.790401)
+inform{'decision': 'reject'} (0.022366)
+inform{'decision': 'accept'} (0.008285)
+[rest] (0.178948)
+2015-05-12 10:53:41,085     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.343572241846
+1	delay	0.461962388298
+2	reject	0.194465369857
+2015-05-12 10:53:41,101     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 10 ------
+2015-05-12 10:53:41,506     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:41,523     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:41,523     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'delay'}
+2015-05-12 10:53:41,523     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'delay'}
+2015-05-12 10:53:41,523     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'delay'} (0.717788)
+inform{'decision': 'accept'} (0.143667)
+inform{'decision': 'reject'} (0.053218)
+[rest] (0.085327)
+2015-05-12 10:53:41,523     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'delay'} (0.717788)
+inform{'decision': 'accept'} (0.143667)
+inform{'decision': 'reject'} (0.053218)
+[rest] (0.085327)
+2015-05-12 10:53:41,539     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.300943543944
+1	delay	0.5606580816
+2	reject	0.138398374457
+2015-05-12 10:53:41,553     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 11 ------
+2015-05-12 10:53:41,976     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:41,992     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:41,992     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= end{}
+2015-05-12 10:53:42,256     INFO   84 simple_simulator:Simulator.simulate_one_dialogue: TOTAL REWARD	=-31.000000
+2015-05-12 10:53:42,303     INFO   44 simple_user_simulator:UserSimulator.new_dialogue: 
+-----------------------------------------------------------------------------
+2015-05-12 10:53:42,303     INFO   45 simple_user_simulator:UserSimulator.new_dialogue: 		User Goal: {'decision': 'reject'}
+2015-05-12 10:53:42,303     INFO   46 simple_user_simulator:UserSimulator.new_dialogue: 
+-----------------------------------------------------------------------------
+2015-05-12 10:53:42,303     INFO   29 simple_simulator:Simulator.simulate_one_dialogue: 
+
+-----------------------------------------------------------------------------
+2015-05-12 10:53:42,303     INFO   30 simple_simulator:Simulator.simulate_one_dialogue: Dialogue 3.		User Goal: {'decision': 'reject'}
+2015-05-12 10:53:42,319     INFO   31 simple_simulator:Simulator.simulate_one_dialogue: -----------------------------------------------------------------------------
+2015-05-12 10:53:42,319     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 1 ------
+2015-05-12 10:53:42,664     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:42,664     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:42,664     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'reject'}
+2015-05-12 10:53:42,664     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'reject'}
+2015-05-12 10:53:42,678     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'reject'} (0.505873)
+inform{'decision': 'delay'} (0.040686)
+inform{'decision': 'accept'} (0.015071)
+[rest] (0.438371)
+2015-05-12 10:53:42,678     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'reject'} (0.505873)
+inform{'decision': 'delay'} (0.040686)
+inform{'decision': 'accept'} (0.015071)
+[rest] (0.438371)
+2015-05-12 10:53:42,694     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.235322441202
+1	delay	0.245292589848
+2	reject	0.51938496895
+2015-05-12 10:53:42,694     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 2 ------
+2015-05-12 10:53:43,131     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:43,148     INFO   54 simple_user_simulator:UserSimulator.da_in: system_da	=request{'decision': ['accept', 'delay', 'reject'], 'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}&sorry{}
+2015-05-12 10:53:43,148     INFO   85 simple_user_simulator:UserSimulator.da_out: user_da	=inform{'decision': 'reject'}
+2015-05-12 10:53:43,148     INFO   48 simple_simulator:Simulator.simulate_one_dialogue: User Action	= inform{'decision': 'reject'}
+2015-05-12 10:53:43,148     INFO   66 simple_asr_simulator:ASRSimulator.simulate_asr: ---ASR Hypothesis:
+inform{'decision': 'reject'} (0.649323)
+inform{'decision': 'accept'} (0.121328)
+inform{'decision': 'delay'} (0.044943)
+[rest] (0.184406)
+2015-05-12 10:53:43,148     INFO   56 simple_simulator:Simulator.simulate_one_dialogue: ASR Hypotheses	=
+inform{'decision': 'reject'} (0.649323)
+inform{'decision': 'accept'} (0.121328)
+inform{'decision': 'delay'} (0.044943)
+[rest] (0.184406)
+2015-05-12 10:53:43,164     INFO   59 simple_simulator:Simulator.simulate_one_dialogue: Belief State	=
+rowID	Z	Probability
+------------------------ 
+0	accept	0.16873642401
+1	delay	0.162714533668
+2	reject	0.668549042323
+2015-05-12 10:53:43,178     INFO   37 simple_simulator:Simulator.simulate_one_dialogue: 
+------ Turn 3 ------
+2015-05-12 10:53:43,601     INFO   41 simple_simulator:Simulator.simulate_one_dialogue: System Action	=end{}&reject{'appointment': {'person': 'Mr. Bean', 'time': 'next Monday at 9.00 AM'}}
+2015-05-12 10:53:43,851     INFO   84 simple_simulator:Simulator.simulate_one_dialogue: TOTAL REWARD	=2.000000

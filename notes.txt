@@ -1,0 +1,17 @@
+Worder:
+- Belief Space is some thing more than Factor?
+- The Belief Space includes continous variable.
+
+Do:
+- Rewards function
+- Features Endcoding
+- GP-Sarsa
+- Exact Policy Optimisation with Sarsa, RL
+- Run experiment with different user type, noise level and comparing the adaptive speed of different DM.
+
+- Belief Update for real SDS with many slot and values
+- GP-Sara for real SDS with many slot and values
+
+- Which thing to do in the Master thesis?
+
+Read:

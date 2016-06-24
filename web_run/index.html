@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="no-js consumer" lang="en">
+<head>
+    <title>hello</title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="scripts/communication.js"></script>
+    <link href="images/logo.png" rel="icon" type="image/png">
+</head>
+
+<body class="" id="grid">
+    <div class="browser-landing" id="main">
+        <div id="div_start">
+          <button id="start_button" onclick="startButton(event)">
+              <img alt="Start" id="start_img" src="images/mic.gif">
+          </button>
+        </div>
+        <div id="info">
+            <p id="info_p" style="color:gray"></p>
+        </div>
+        <div id="results">
+          <span class="final" id="final_span"></span>
+          <span class="interim" id="interim_span"></span>
+        </div>
+        <div id="output">
+            output
+        </div>
+        <div id="debug">
+            debug
+        </div>
+        
+    </div>
+    
+    <script>
+    var recognizing = false;
+    var ignore_onend = false;
+    var session = 'undifined';
+    var unsuportBrowser = false;
+    
+    if (!('webkitSpeechRecognition' in window)) {
+        start_img.src = 'images/mic-slash.gif';
+        showInfo('Sorry, please using <a href="http://www.google.com/chrome/">chrome</a> or <a href="https://www.apple.com/safari/">Safari</a>');
+        unsuportBrowser = true ;
+        //upgrade();
+    }else{
+        start_button.style.display = 'inline-block';
+        var recognition = new webkitSpeechRecognition();
+        recognition.maxAlternatives=6
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        showInfo('Say "okay" or click on microphone icon to speak')
+        
+        recognition.onstart = function() {
+            recognizing = true;
+            start_img.src = 'images/mic-animate.gif';
+        };
+        recognition.onend = function() {
+            recognizing = false;
+            if (ignore_onend) {
+                return;
+            }
+            start_img.src = 'images/mic.gif';
+            showInfo('Say "okay" or click on microphone icon to speak')
+        };
+        recognition.onresult = function(event) {
+            var interim_transcript = '';
+            if (typeof(event.results) == 'undefined') {
+                recognition.onend = null;
+                recognition.stop();
+                //upgrade();
+                return;
+            }
+            showInfo('')
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    final_transcript += event.results[i][0].transcript;
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
+            }
+            final_transcript = capitalize(final_transcript);
+            final_span.innerHTML = linebreak(final_transcript);
+            interim_span.innerHTML = linebreak(interim_transcript);
+            if (final_transcript || interim_transcript) {
+                //showButtons('inline-block');//khi co text
+            }
+            if (interim_transcript.length==0){//send data
+                var rets = event.results[event.results.length-1];
+                var hyps = ''; //'{0:{"transcript":"abc", "confidence":0.9}, 1:...}
+                for(var i = 0; i< rets.length; ++i){
+                    hyps += '"' + i + '":{"transcript":"' + rets[i]['transcript'].trim() + '", "confidence":' + rets[i]['confidence'] + '},';
+                }
+                hyps = hyps.substring(0, hyps.length-1)
+                var asr_hyps = '{"length":' + rets.length + ',' + hyps + '}';
+                var content = '{"type":"user_turn", "asr_hyps":' + asr_hyps +'}' ;
+                //var content = '{"type":"user_turn", "transcript":"' + final_transcript.trim() + '", "confidence":' + event.results[event.results.length-1][0]['confidence'] + '}';
+                sendDM(content)
+                final_transcript = ''
+            }
+        };
+        recognition.onerror = function(event) {
+            if (event.error == 'no-speech') {
+                start_img.src = 'images/mic.gif';
+                showInfo('No speech was detected!');
+                ignore_onend = true;//Why?
+            }
+            if (event.error == 'audio-capture') {
+                start_img.src = 'images/mic.gif';
+                showInfo('No microphone was found!?');
+                ignore_onend = true;
+            }
+            if (event.error == 'not-allowed') {
+                if (event.timeStamp - start_timestamp < 100) {
+                    showInfo('Permission to use microphone is blocked. To change, go tochrome://settings/contentExceptions#media-stream');
+                } else {
+                    showInfo('You do not allow me to use your microphone!');
+                }
+                ignore_onend = true;
+            }
+          };
+        /*
+        recognition.onspeechend = function(event) {
+            //showOutput('speech end')
+        }
+        recognition.onspeechstart = function(event) {
+            showOutput('speech start')
+        }
+        recognition.onsoundend = function(event) {
+            showOutput('sound end')
+        }
+        recognition.onsoundstart = function(event) {
+            showOutput('sound start')
+        }
+        */
+    }
+    
+    function startButton(event) {
+        if (unsuportBrowser == true){
+            return ;
+        }
+        if (recognizing) {
+            recognition.stop();
+            return;
+        }
+        showInfo('Listen to you!');
+        tts('Listen to you!')//take tiem to load
+        final_transcript = '';
+        recognition.lang = 'en-US';
+        recognition.start();
+        ignore_onend = false;
+        final_span.innerHTML = '';
+        interim_span.innerHTML = '';
+        start_img.src = 'images/mic-slash.gif';
+        start_timestamp = event.timeStamp;
+    }
+
+    function showInfo(text){
+        info_p.innerHTML = text
+    }
+    function showDebug(text){
+        debug.innerHTML = text        
+    }
+    function showOutput(text){
+        output.innerHTML = text        
+    }
+
+    var two_line = /\n\n/g;
+    var one_line = /\n/g;
+    function linebreak(s) {
+        return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+    }
+    var first_char = /\S/;
+    function capitalize(s) {
+        return s.replace(first_char, function(m) { return m.toUpperCase(); });
+    }
+    //--------support functions
+    function tts(text){
+        if (text != ''){
+            //stopASR();
+            u = new SpeechSynthesisUtterance(text)
+            /*
+            u.onend = function(event){
+                startASR();
+            }*/
+            speechSynthesis.speak(u);
+        }
+    }
+    function stopTTS(){
+        if (speechSynthesis.speaking){
+            speechSynthesis.cancel()//stop talking for new message
+        }
+    }
+    function stopASR(){
+        if (recognizing) {
+            recognizing = false
+            recognition.stop();
+        }
+    }
+    function startASR(){
+        if (recognizing==false) {
+            recognizing = true
+            recognition.start();
+        }
+    }
+    function display(id, html){
+        id.innerHTML = html;
+    }
+    function displayAppend(id, html){
+        id.innerHTML = html;
+    }
+    function getFullContent(content){
+        //TODO: push session or unique id handling many access paralell
+        fContent = '{"session":"'+session+'", "message":' + content + '}\n';
+        return fContent
+    }
+    
+    //--------For DM    
+    function sendDM(content){
+        content = getFullContent(content)
+        var url = location.protocol + '//' + location.host + '/dm';
+        var request = new send('POST', 'application/json', url, true, content + '\n', callbackDM);
+    }
+
+    function callbackDM(data){
+        //showDebug('|' + data.text + '|')
+        ret = eval('(' + data.text + ')');
+        
+        if (ret['message']['tts']){
+            showInfo(ret['message']['tts'])
+            stopTTS()
+            tts(ret['message']['tts'])
+        }
+        if (ret['message']['debug']){
+            showDebug(ret['message']['debug'])
+        }
+        if (ret['message']['output']){
+            showOutput(ret['message']['output'])
+        }
+    }
+
+    window.onload = startButton;
+    </script>
+</body>
+</html>

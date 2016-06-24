@@ -1,0 +1,9 @@
+<grammar tag-format="semantics/1.0" version="1.0" root="all">
+<rule id="all">
+<item><one-of>
+   <item>accept<tag>out.decision="ACCEPT"</tag></item>
+   <item>delay<tag>out.decision="delay"</tag></item>
+   <item>reject<tag>out.decision="reject"</tag></item>
+</one-of></item>
+</rule>
+</grammar>
